@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to HelpBot - Email Verification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            padding: 30px;
+            text-align: center;
+        }
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .content {
+            padding: 40px;
+            color: #374151;
+        }
+        .welcome-text {
+            color: #ffffff;
+            margin: 0;
+            font-size: 28px;
+        }
+        .otp-container {
+            background-color: #f3f4f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .otp-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4f46e5;
+            letter-spacing: 4px;
+            margin: 10px 0;
+        }
+        .footer {
+            background-color: #f9fafb;
+            padding: 20px 40px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .signature {
+            color: #6b7280;
+            margin: 0;
+        }
+        .highlight {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        .instructions {
+            background-color: #fff7ed;
+            border-left: 4px solid #f97316;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <img src="https://static.vecteezy.com/system/resources/thumbnails/017/193/643/small/robot-logo-icon-template-free-vector.jpg" 
+                 alt="HelpBot Logo" 
+                 class="logo">
+            <h1 class="welcome-text">Welcome to HelpBot</h1>
+        </div>
+
+        <div class="content">
+            <h2>Hello <span th:text="${student.name}" class="highlight"></span>!</h2>
+            
+            <div class="instructions">
+                <p>To complete your account creation, please use the OTP code below:</p>
+            </div>
+
+            <div class="otp-container">
+                <p>Your One-Time Password (OTP) is:</p>
+                <div class="otp-number" th:text="${student.otp}"></div>
+                <p>This OTP will expire in 10 minutes</p>
+            </div>
+
+            <p>If you didn't request this verification, please ignore this email.</p>
+        </div>
+
+        <div class="footer">
+            <h3 class="signature">Best Regards,</h3>
+            <h4 class="signature">The HelpBot Team</h4>
+        </div>
+    </div>
+</body>
+</html>

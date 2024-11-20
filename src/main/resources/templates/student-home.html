@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Student Home page | HelpBot</title>
+</head>
+<body>
+    <div th:if="${session.failure}" th:text="${session.failure}"></div>
+    <div th:if="${session.success}" th:text="${session.success}"></div>
+    <div th:text="${@sessionMessageRemover.removeMessage()}"></div>
+
+    <h1>Student Dashboard</h1>
+    <a href="/student/questions"><button>Chat with Bot</button></a>
+    <a href="/logout"><button>Logout</button></a>
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HelpBot - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-section img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+
+        .logo-section h2 {
+            color: #1a73e8;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-section p {
+            color: #5f6368;
+        }
+
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+        }
+
+        .alert-danger {
+            background: #fde8e8;
+            color: #c81e1e;
+        }
+
+        .alert-success {
+            background: #e8fdf1;
+            color: #1ec85c;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-container {
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 0.5rem;
+        }
+
+        .input-container:focus-within {
+            border-color: #1a73e8;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #1557b0;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .register-link a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-section">
+            <img src="https://media.istockphoto.com/id/1445426863/vector/chat-bot-vector-logo-design-concept.jpg?s=612x612&w=0&k=20&c=XDdfzS4lNW9yxQ0BQGZq9KMLL4bJ8ywXlYdAhBSuoCA=" 
+                 alt="HelpBot Logo">
+            <h2>Welcome Back</h2>
+            <p>Login to your HelpBot account</p>
+        </div>
+
+        <div th:if="${session.failure}" class="alert alert-danger">
+            <span th:text="${session.failure}"></span>
+        </div>
+
+        <div th:if="${session.success}" class="alert alert-success">
+            <span th:text="${session.success}"></span>
+        </div>
+
+        <div th:if="${@sessionMessageRemover.removeMessage()}"></div>
+
+        <form action="/login" method="post">
+            <div class="input-group">
+                <div class="input-container">
+                    <input type="text" 
+                           name="email" 
+                           placeholder="Enter your email"
+                           required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-container">
+                    <input type="password" 
+                           name="password" 
+                           placeholder="Enter your password"
+                           required>
+                </div>
+            </div>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="register-link">
+            <p>Don't have an account? <a href="/student/register">Register here</a></p>
+        </div>
+    </div>
+</body>
+</html>

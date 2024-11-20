@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Product</title>
+</head>
+<body>
+    <h1>Edit Questions</h1>
+
+    <form action="/teacher/edit-question" method="post"  th:object="${qusAns}">
+        <input type="hidden" name="id" th:value="*{id}">
+        
+        <div>
+            <label>Question:</label>
+            <input type="text"  name="question" th:value="*{question}"/>
+            <span th:errors="*{question}"></span>
+        </div>
+        <div>
+            <label>Answer:</label>
+            <textarea name="answer"><th:block th:text="*{answer}"></th:block></textarea>
+            <span th:errors="*{answer}"></span>
+        </div>
+
+
+        <button type="submit">Update Question</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HelpBot - OTP Verification</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #36D1DC;
+            --accent-color: #FF6B6B;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #6a3093, #a044ff, #4a90e2, #36D1DC);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            min-height: 100vh;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .otp-container {
+            max-width: 450px;
+            margin: 100px auto;
+            padding: 20px;
+        }
+
+        .otp-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .otp-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .otp-logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .otp-input {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 2rem 0;
+        }
+
+        .otp-input input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            margin: 0 5px;
+            transition: all 0.3s;
+        }
+
+        .otp-input input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.2);
+        }
+
+        .btn-verify {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            width: 100%;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .btn-verify:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .resend-timer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #666;
+        }
+
+        .resend-button {
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .resend-button.disabled {
+            color: #999;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="otp-container">
+            <div class="otp-card">
+                <div class="otp-header">
+                    <img src="https://media.istockphoto.com/id/1445426863/vector/chat-bot-vector-logo-design-concept.jpg?s=612x612&w=0&k=20&c=XDdfzS4lNW9yxQ0BQGZq9KMLL4bJ8ywXlYdAhBSuoCA=" 
+                         alt="HelpBot Logo" 
+                         class="otp-logo rounded-circle">
+                    <h2>OTP Verification</h2>
+                    <p class="text-muted">Enter the OTP sent to your email</p>
+                </div>
+
+                <div th:if="${session.failure}" class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${session.failure}"></span>
+                </div>
+
+                <div th:if="${session.success}" class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${session.success}"></span>
+                </div>
+
+                <form th:action="'/student/submit-otp/'+${session.id}" method="post" id="otpForm">
+                    <div class="otp-input">
+                        <input type="text" maxlength="1" pattern="[0-9]" required>
+                        <input type="text" maxlength="1" pattern="[0-9]" required>
+                        <input type="text" maxlength="1" pattern="[0-9]" required>
+                        <input type="text" maxlength="1" pattern="[0-9]" required>
+                        <input type="text" maxlength="1" pattern="[0-9]" required>
+                        <input type="text" maxlength="1" pattern="[0-9]" required>
+                    </div>
+                    <input type="hidden" id="completeOtp" name="otp">
+                    
+                    <button type="submit" class="btn btn-verify">
+                        <i class="fas fa-check-circle me-2"></i>Verify OTP
+                    </button>
+                </form>
+
+                <div class="resend-timer">
+                    <span>Didn't receive the code? </span>
+                    <span id="timer">01:30</span>
+                    <a href="#" class="resend-button disabled" id="resendButton">Resend OTP</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // OTP Input Handling
+        const inputs = document.querySelectorAll('.otp-input input');
+        const form = document.getElementById('otpForm');
+        const completeOtp = document.getElementById('completeOtp');
+
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1) {
+                    if (index < inputs.length - 1) inputs[index + 1].focus();
+                }
+                combineOtp();
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value) {
+                    if (index > 0) inputs[index - 1].focus();
+                }
+            });
+        });
+
+        function combineOtp() {
+            completeOtp.value = Array.from(inputs).map(input => input.value).join('');
+        }
+
+        // Resend Timer
+        let timeLeft = 90; // 1:30 minutes in seconds
+        const timerDisplay = document.getElementById('timer');
+        const resendButton = document.getElementById('resendButton');
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft === 0) {
+                resendButton.classList.remove('disabled');
+                timerDisplay.style.display = 'none';
+            } else {
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            }
+        }
+
+        updateTimer();
+
+        resendButton.addEventListener('click', (e) => {
+            if (!resendButton.classList.contains('disabled')) {
+                // Add your resend OTP logic here
+                timeLeft = 60;
+                timerDisplay.style.display = 'inline';
+                resendButton.classList.add('disabled');
+                updateTimer();
+            }
+            e.preventDefault();
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

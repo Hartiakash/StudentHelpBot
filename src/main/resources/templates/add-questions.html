@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Questions and Answers | HelpBot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/teacher/home">
+                <i class="fas fa-robot me-2"></i>HelpBot
+            </a>
+            <a href="/teacher/home" class="btn btn-outline-light">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <!-- Alerts -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div th:if="${session.failure}" class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${session.failure}"></span>
+                </div>
+                <div th:if="${session.success}" class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${session.success}"></span>
+                </div>
+                <div th:text="${@sessionMessageRemover.removeMessage()}" hidden></div>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h4 class="card-title mb-0 text-center">Add Questions and Answers</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="/teacher/add-questions" method="post" th:object="${qusAns}">
+                            <div class="mb-4">
+                                <label for="question" class="form-label fw-bold">Question</label>
+                                <input type="text" 
+                                       class="form-control form-control-lg" 
+                                       name="question" 
+                                       th:value="*{question}"
+                                       placeholder="Enter your question here">
+                                <div class="text-danger mt-1" th:errors="*{question}"></div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="answer" class="form-label fw-bold">Answer</label>
+                                <textarea class="form-control" 
+                                          name="answer" 
+                                          rows="6"
+                                          placeholder="Enter the detailed answer here"><th:block th:text="*{answer}"></th:block></textarea>
+                                <div class="text-danger mt-1" th:errors="*{answer}"></div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-plus-circle me-2"></i>Add Question & Answer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
