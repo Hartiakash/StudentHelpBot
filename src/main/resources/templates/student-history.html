@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat History - HelpBot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        .chat-bubble {
+            border-radius: 20px;
+            padding: 15px;
+            margin: 10px;
+            max-width: 70%;
+        }
+        .student-message {
+            background-color: #e3f2fd;
+            margin-right: auto;
+        }
+        .bot-message {
+            background-color: #f5f5f5;
+            margin-left: auto;
+        }
+        .timestamp {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/student/home">
+                <i class="bi bi-robot me-2"></i>
+                HelpBot
+            </a>
+            <a class="btn btn-outline-light" href="/student/home">
+                <i class="bi bi-house-door-fill me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                <!-- Alert Messages -->
+                <div th:if="${session.failure}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span th:text="${session.failure}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${session.success}" class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span th:text="${session.success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:text="${@sessionMessageRemover.removeMessage()}" hidden></div>
+
+                <!-- Chat History Card -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="bi bi-chat-dots-fill me-2 text-primary"></i>
+                            Chat History
+                        </h4>
+                        <span class="badge bg-primary" th:text="${#lists.size(chatHistory)} + ' Messages'"></span>
+                    </div>
+                    <div class="card-body" style="max-height: 70vh; overflow-y: auto;">
+                        <div class="d-flex flex-column">
+                            <div th:each="history : ${chatHistory}" class="mb-4">
+                                <!-- Student Question -->
+                                <div class="d-flex flex-column">
+                                    <div class="chat-bubble student-message shadow-sm">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-person-circle text-primary me-2"></i>
+                                            <strong>You</strong>
+                                        </div>
+                                        <p class="mb-1" th:text="${history.question}"></p>
+                                        <small class="timestamp" th:text="${history.timestamp}"></small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Bot Response -->
+                                <div class="d-flex flex-column">
+                                    <div class="chat-bubble bot-message shadow-sm">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-robot text-success me-2"></i>
+                                            <strong>HelpBot</strong>
+                                        </div>
+                                        <p class="mb-1" th:text="${history.response}"></p>
+                                        <small class="timestamp" th:text="${history.timestamp}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

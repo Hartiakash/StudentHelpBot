@@ -5,88 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat with HelpBot</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
         .chat-container {
             height: 75vh;
             overflow-y: auto;
+            background-color: #f8f9fa;
+            border-radius: 15px;
         }
-        .message {
+        .message-bubble {
             max-width: 75%;
             margin: 10px;
+            padding: 15px;
+            border-radius: 20px;
         }
         .user-message {
             background: #007bff;
             color: white;
-            border-radius: 15px 15px 0 15px;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
         }
         .bot-message {
-            background: #f0f2f5;
-            border-radius: 15px 15px 15px 0;
+            background: white;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body class="bg-light">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="/student/home">HelpBot</a>
-            <a class="btn btn-outline-light" href="/student/home">Back to Dashboard</a>
+            <a class="navbar-brand d-flex align-items-center" href="/student/home">
+                <i class="bi bi-robot me-2"></i>
+                HelpBot
+            </a>
+            <a class="btn btn-outline-light" href="/student/home">
+                <i class="bi bi-house-door-fill me-2"></i>Back to Dashboard
+            </a>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Alert Messages -->
-        <div class="row mb-4">
-            <div class="col-12">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <!-- Alerts -->
                 <div th:if="${session.failure}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     <span th:text="${session.failure}"></span>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 <div th:if="${session.success}" class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle-fill me-2"></i>
                     <span th:text="${session.success}"></span>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 <div th:text="${@sessionMessageRemover.removeMessage()}" hidden></div>
-            </div>
-        </div>
 
-        <!-- Chat Interface -->
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card shadow">
+                <!-- Chat Area -->
+                <div class="card shadow-sm">
                     <div class="card-header bg-white">
-                        <h4 class="mb-0">Chat with HelpBot</h4>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-chat-dots-fill text-primary me-2"></i>
+                            <h5 class="mb-0">Chat with HelpBot</h5>
+                        </div>
                     </div>
-                    <div class="card-body chat-container">
+                    
+                    <div class="chat-container p-3">
                         <!-- Welcome Message -->
-                        <div class="d-flex">
-                            <div class="message bot-message p-3">
-                                <p class="mb-0">Hello! I'm HelpBot. How can I assist you today?</p>
+                        <div class="message-bubble bot-message">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-robot text-primary me-2"></i>
+                                <strong>HelpBot</strong>
+                            </div>
+                            <p class="mb-0">Hello! I'm HelpBot. How can I assist you today?</p>
+                        </div>
+
+                        <!-- Chat History -->
+                        <div th:each="chat : ${chatHistory}">
+                            <div class="message-bubble user-message">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-person-fill me-2"></i>
+                                    <strong>You</strong>
+                                </div>
+                                <p class="mb-0" th:text="${chat.question}"></p>
+                            </div>
+                            <div class="message-bubble bot-message">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-robot text-primary me-2"></i>
+                                    <strong>HelpBot</strong>
+                                </div>
+                                <p class="mb-0" th:text="${chat.response}"></p>
                             </div>
                         </div>
-                        
-                        <!-- Chat Messages -->
-                        <div th:if="${answer}" class="d-flex flex-column">
-                            <div class="d-flex justify-content-end">
-                                <div class="message user-message p-3">
-                                    <p class="mb-0" th:text="${question}"></p>
-                                </div>
+
+                        <!-- Current Conversation -->
+                        <div th:if="${answer}">
+                            <div class="message-bubble user-message">
+                                <p class="mb-0" th:text="${question}"></p>
                             </div>
-                            <div class="d-flex">
-                                <div class="message bot-message p-3">
-                                    <p class="mb-0" th:text="${answer}"></p>
-                                </div>
+                            <div class="message-bubble bot-message">
+                                <p class="mb-0" th:text="${answer}"></p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Question Input -->
+                    <!-- Message Input -->
                     <div class="card-footer bg-white">
                         <form action="/student/getAnswer" method="get" class="d-flex gap-2">
-                            <input type="text" class="form-control" id="question" name="question" 
+                            <input type="text" class="form-control" name="question" 
                                    placeholder="Type your question here..." required>
-                            <button type="submit" class="btn btn-primary">Send</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -96,7 +130,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Auto-scroll to bottom on new messages
         window.onload = function() {
             const chatContainer = document.querySelector('.chat-container');
             chatContainer.scrollTop = chatContainer.scrollHeight;

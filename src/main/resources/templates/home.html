@@ -141,6 +141,18 @@
             </div>
         </div>
     </nav>
+    
+    <div th:if="${session.failure}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span th:text="${session.failure}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${session.success}" class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span th:text="${session.success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:text="${@sessionMessageRemover.removeMessage()}" hidden></div>
 
     <!-- Hero Section -->
     <section class="hero-section">
@@ -194,7 +206,7 @@
         </div>
     </section>
 
-    <!-- Stats Counter -->
+    <!-- Stat Counter -->
     <section class="stats-counter">
         <div class="container">
             <div class="row text-center">

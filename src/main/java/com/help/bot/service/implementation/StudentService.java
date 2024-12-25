@@ -21,6 +21,8 @@ public interface StudentService {
 	String loadHome(HttpSession session);
 
 	String getAnswer(String question, ModelMap map, HttpSession session);
+
+	String viewChatHistory(HttpSession session, ModelMap map);
 	
 	
 

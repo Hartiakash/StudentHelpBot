@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.help.bot.dto.ChatHistory;
 import com.help.bot.dto.QusAns;
 import com.help.bot.dto.Student;
 import com.help.bot.helper.AES;
@@ -25,6 +28,9 @@ import jakarta.validation.Valid;
 public class StudentServiceImpl implements StudentService{
 	@Autowired
 	Student student;
+	
+	@Autowired
+	ChatHistoryService chatHistoryService;
 	
 	@Autowired
 	MyEmailSender emailSender;
@@ -90,25 +96,29 @@ public class StudentServiceImpl implements StudentService{
 	}
 
 	@Override
-	public String viewQuestions(HttpSession session, ModelMap map){
-        if (session.getAttribute("student") != null) {
-            List<QusAns> qusAnss = qusAnsRepositery.findByApprovedTrue();
-            if (qusAnss.isEmpty()) {
-                session.setAttribute("failure", "No Questions Found");
-                return "redirect:/student/home";
-            } else {
-                Student student = (Student) session.getAttribute("student");
-                if (student.getCart() != null) {
-                    map.put("ques", student.getCart().getQuestions());
-                }
-                map.put("qusAnss", qusAnss);
-                return "student-questions.html";
-            }
-        } else {
-            session.setAttribute("failure", "Invalid Session, Login Again");
-            return "redirect:/login";
-        }
+	public String viewQuestions(HttpSession session, ModelMap map) {
+	    if (session.getAttribute("student") != null) {
+	        Student student = (Student) session.getAttribute("student");
+	        List<ChatHistory> chatHistory = chatHistoryService.getChatHistory(student.getId());
+	        map.put("chatHistory", chatHistory);
+
+	        List<QusAns> qusAnss = qusAnsRepositery.findByApprovedTrue();
+	        if (!qusAnss.isEmpty()) {
+	            if (student.getCart() != null) {
+	                map.put("ques", student.getCart().getQuestions());
+	            }
+	            map.put("qusAnss", qusAnss);
+	        } else {
+	            session.setAttribute("failure", "No Questions Found");
+	            return "redirect:/student/home";
+	        }
+	        return "student-questions.html";
+	    } else {
+	        session.setAttribute("failure", "Invalid Session, Login Again");
+	        return "redirect:/login";
+	    }
 	}
+
 
 	@Override
 	public String loadHome(HttpSession session) {
@@ -119,24 +129,55 @@ public class StudentServiceImpl implements StudentService{
 			return "redirect:/login";
 		}
 	}
+	
+	
+	@GetMapping("/getAnswer")
+	public String getAnswer(@RequestParam("question") String question, ModelMap map, HttpSession session) {
+	    Student student = (Student) session.getAttribute("student");
+	    if (student == null) {
+	        session.setAttribute("failure", "Invalid session, Login Again");
+	        return "redirect:/login";
+	    }
+
+	    // Retrieve existing chat history
+	    List<ChatHistory> chatHistory = chatHistoryService.getChatHistory(student.getId());
+	    map.put("chatHistory", chatHistory);
+
+	    // Handle the new question
+	    Optional<QusAns> qusAnsOptional = qusAnsRepositery.findFirstByQuestionAndApprovedTrue(question);
+	    if (qusAnsOptional.isPresent()) {
+	        String answer = qusAnsOptional.get().getAnswer();
+
+	        // Save the chat interaction
+	        chatHistoryService.saveChat(student, question, answer);
+
+	        // Add new chat entry to the map
+	        map.put("question", question);
+	        map.put("answer", answer);
+	    } else {
+	        session.setAttribute("failure", "No answer found for the given question.");
+	    }
+
+	    return "student-questions.html";
+	}
+
 
 	@Override
-	public String getAnswer(String question, ModelMap map, HttpSession session) {
+	public String viewChatHistory(HttpSession session, ModelMap map) {
 		
-		{
-		    Optional<QusAns> qusAnsOptional = qusAnsRepositery.findFirstByQuestionAndApprovedTrue(question);
-		    if (qusAnsOptional.isPresent()) {
-				map.put("question", qusAnsOptional.get().getQuestion());
-		        map.put("answer", qusAnsOptional.get().getAnswer());
-		        return "student-questions.html";
-		    } else {
-		        session.setAttribute("failure", "No answer found for the given question.");
-		        return "redirect:/student/questions"; 
-		    }
-		}
+		Student student = (Student) session.getAttribute("student");
+	    if (student != null) {
+	        List<ChatHistory> chatHistory = chatHistoryService.getChatHistory(student.getId());
+	        map.put("chatHistory", chatHistory);
+	        return "student-history.html"; // Create a Thymeleaf or JSP template for displaying history
+	    } else {
+	        session.setAttribute("failure", "Invalid session, Login Again");
+	        return "redirect:/login";
+	    }
 		
 		
 		
 		
-}
-}
+	}
+
+	}

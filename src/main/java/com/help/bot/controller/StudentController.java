@@ -1,5 +1,6 @@
 package com.help.bot.controller;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -9,13 +10,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.help.bot.dto.Student;
+
 import com.help.bot.service.implementation.StudentService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -26,6 +28,7 @@ public class StudentController {
 	
 	@Autowired
 	StudentService studentService;
+	
 	
 	
 	@GetMapping("/register")
@@ -64,6 +67,14 @@ public class StudentController {
 	public String getAnswer(@RequestParam("question") String question, ModelMap map, HttpSession session) {
 	    return studentService.getAnswer(question, map, session);
 	}
+	
+	@GetMapping("/history")
+	public String viewChatHistory(HttpSession session, ModelMap map) {
+		return studentService.viewChatHistory(session,map);
+	}
+	
+	
+	
 	
 	
 	
